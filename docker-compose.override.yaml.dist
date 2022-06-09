@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+    app:
+        # image: ecr-thing-app:local
+        volumes:
+            - .:/var/www
+
+    web:
+        # image: ecr-thing-web:local
+        volumes:
+            - ./public:/var/www/public

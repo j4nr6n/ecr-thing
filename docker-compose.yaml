@@ -1,0 +1,13 @@
+version: '3.7'
+services:
+    app:
+        image: ecr-thing-app:local-dev
+        ports:
+            - '9000:9000'
+
+    web:
+        image: ecr-thing-web:local-dev
+        ports:
+            - '8080:80'
+        links:
+            - app
