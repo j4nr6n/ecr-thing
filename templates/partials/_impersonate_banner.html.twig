@@ -1,0 +1,11 @@
+<div id="impersonate-banner" class="alert alert-danger text-center m-0 rounded-0">
+    <p>
+        You are impersonating {{ app.user.email }}.
+        Aside from this banner, everything is as if you were logged into their account.
+    </p>
+
+    {# Disable Turbo on this link. We are changing permission contexts #}
+    <a href="{{ path('admin_user_index', {'_become': '_exit'}) }}" data-turbo="false">
+        Exit impersonation
+    </a>
+</div>

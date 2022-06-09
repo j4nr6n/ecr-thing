@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <aside class="col-md-3 col-xl-2">
+                <nav class="list-group">
+                    <a href="{{ path('admin_index') }}"
+                       class="{{ app.request.get('_route') == 'admin_index' ? 'active' }} list-group-item list-group-item-action">
+                        Dashboard
+                    </a>
+
+                    <a href="{{ path('admin_user_index') }}"
+                       class="{{ app.request.get('_route') == 'admin_user_index' ? 'active' }} list-group-item list-group-item-action">
+                        Users
+                    </a>
+                </nav>
+            </aside>
+
+            <main class="col-md-9 col-xl-10">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+{% endblock %}

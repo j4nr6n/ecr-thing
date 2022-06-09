@@ -1,0 +1,23 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Create A New User{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col d-flex justify-content-between">
+                <h1>Create A New User</h1>
+
+                <div class="align-self-center">
+                    <a href="{{ path('admin_user_index') }}" class="btn btn-primary">Back To List</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                {{ include('admin/user/_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

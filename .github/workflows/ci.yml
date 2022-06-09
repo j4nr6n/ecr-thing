@@ -1,0 +1,76 @@
+name: CI Workflow
+
+on: [push, pull_request]
+
+jobs:
+    ci:
+        name: 'ECR Thing (PHP ${{ matrix.php-versions }})'
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: true
+            matrix:
+                php-versions: ['8.1']
+        steps:
+            - name: Checkokut
+              uses: actions/checkout@v2
+
+            - name: Setup PHP, extensions, and Composer
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-versions }}
+                  extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, dom, filter, gd, json
+              env:
+                  update: true
+
+            - name: Check PHP Version
+              run: php -v
+
+            - name: Validate composer.json and composer.lock
+              run: composer validate
+
+            - name: Get Composer Cache Directory
+              id: composer-cache
+              run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            - name: Cache Composer Dependencies
+              uses: actions/cache@v1
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: ${{ runner.os }}-composer-
+
+            - name: Install Composer Dependencies
+              run: composer install --prefer-dist --no-progress
+
+            - name: Lint Container
+              run: ./bin/console lint:container
+
+            - name: Lint Twig Templates
+              run: ./bin/console lint:twig templates/
+
+            - name: Lint YAML
+              run: ./bin/console lint:yaml config/
+
+            - name: Coding Standards Checks
+              run: ./vendor/bin/phpcs
+
+            - name: Psalm Static Analysis
+              run: ./vendor/bin/psalm
+
+            - name: Setup Test Database
+              run: APP_ENV=test bin/console doctrine:schema:create
+
+            - name: Yarn Install
+              uses: actions/setup-node@v2
+              with:
+                  node-version: '14'
+            - run: yarn install
+
+            - name: ESLint
+              run: yarn lint
+
+            - name: Build Frontend
+              run: yarn build
+
+            - name: PHPUnit
+              run: ./bin/phpunit

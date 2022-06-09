@@ -1,0 +1,21 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4">
+            <div class="col">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="card-title m-0">Users</h5>
+                            <i class="fas fa-users fa-fw text-muted align-self-center"></i>
+                        </div>
+
+                        <p class="card-text m-0" style="font-size: 2rem;">{{ user_count }}</p>
+                        <a href="{{ path('admin_user_index') }}" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

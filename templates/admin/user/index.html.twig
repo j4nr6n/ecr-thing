@@ -1,0 +1,38 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Users{% endblock %}
+
+{% block content %}
+    <div class="container-fluid" {{ stimulus_controller('reload-content', {
+        'url': path('admin_user_index', { 'ajax': 1 })
+    }) }} data-action="modal-form:success->reload-content#refreshContent">
+        <div class="row">
+            <div class="col d-flex justify-content-between">
+                <h1>Users</h1>
+
+                <div class="align-self-center">
+                    <div class="d-inline" {{ stimulus_controller('modal-form', {
+                        formUrl: path('admin_user_new', { 'ajax': 1 })
+                    }) }}>
+                        <a href="{{ path('admin_user_new') }}"
+                           class="btn btn-primary"
+                           data-action="modal-form#openModal">
+                            <i class="fas fa-plus-circle"></i>
+                            New User
+                        </a>
+
+                        {{ include('partials/_modal.html.twig', {
+                            'modal_title': 'Create A New User'
+                        }) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col" data-reload-content-target="content">
+                {{ include('admin/user/_list.html.twig') }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,61 @@
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Email</th>
+        <th scope="col">Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for user in users %}
+        <tr>
+            <th scope="row">{{ user.id }}</th>
+            <td>{{ user.email }}</td>
+            <td>
+                <div class="d-inline">
+                    <a href="{{ path('admin_user_show', {'id': user.id}) }}"
+                       class="btn btn-primary btn-sm">
+                        Show
+                    </a>
+                </div>
+
+                <div class="d-inline" {{ stimulus_controller('modal-form', {
+                    formUrl: path('admin_user_edit', {
+                        'id': user.id,
+                        'ajax': 1
+                    })
+                }) }}>
+                    <a href="{{ path('admin_user_edit', {'id': user.id}) }}"
+                       class="btn btn-info btn-sm"
+                       data-action="modal-form#openModal">
+                        Edit
+                    </a>
+
+                    {{ include('partials/_modal.html.twig', {
+                        'modal_title': 'Edit User #' ~ user.id
+                    }) }}
+                </div>
+
+                {% if app.user and app.user.id != user.id %}
+                    {% if is_granted('ROLE_ALLOWED_TO_SWITCH') and not is_granted('ROLE_PREVIOUS_ADMIN') %}
+                        {# Disable Turbo on this link. We are changing permission contexts #}
+                        <a href="{{ path('homepage', {'_become': user.email}) }}"
+                           class="btn btn-warning btn-sm"
+                           data-turbo="false">
+                            Impersonate
+                        </a>
+                    {% endif %}
+
+                    {{ include('admin/user/_delete_form.html.twig', {
+                        sm: true,
+                    }) }}
+                {% endif %}
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="3">no records found</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <meta name="description" content="{% block description %}Another Thing{% endblock %}"/>
+        {% block metas %}{% endblock %}
+
+        <title>{% block title %}👋{% endblock %} - ECR Thing</title>
+
+        {# TODO: Source a favicon. This is just a base64 encoded, empty png  #}
+        <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo=">
+
+        {% block stylesheets %}
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+        {% endblock %}
+    </head>
+
+    <body>
+        {% if is_granted('IS_IMPERSONATOR') %}
+            {% include 'partials/_impersonate_banner.html.twig' %}
+        {% endif %}
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{{ path('homepage') }}" data-turbo="false">
+                    <i class="fa-solid fa-tower-cell"></i>
+                    ECR Thing
+                </a>
+
+                <button type="button"
+                        class="navbar-toggler"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent"
+                        aria-controls="navbarSupportedContent"
+                        aria-expanded="false"
+                        aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a href="{{ path('homepage') }}"
+                               class="nav-link {{ app.request.get('_route') == 'homepage' ? 'active' }}">
+                                {{ app.user ? 'Dashboard' : 'Home' }}
+                                {% if app.request.get('_route') == 'homepage' %}
+                                    <span class="visually-hidden">(current)</span>
+                                {% endif %}
+                            </a>
+                        </li>
+
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item">
+                                <a href="{{ path('admin_index') }}"
+                                   class="nav-link {{ app.request.get('_route') == 'admin_index' ? 'active' }}">
+                                    Admin
+                                    {% if app.request.get('_route') == 'admin_index' %}
+                                        <span class="visually-hidden">(current)</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                        {% if not app.user %}
+                            <li class="nav-item">
+                                <a href="{{ path('login') }}"
+                                   class="nav-link {{ app.request.get('_route') == 'login' ? 'active' }}">
+                                    Sign In
+                                    {% if app.request.get('_route') == 'login' %}
+                                        <span class="visually-hidden">(current)</span>
+                                    {% endif %}
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% if app.user %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link{{ app.request.get('_route') starts with 'user_' ? 'active' }}"
+                                   href="#"
+                                   id="navbarDropdownMenuLink"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v fa-fw"></i>
+                                </a>
+
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink">
+                                    {# <li>
+                                        <a class="dropdown-item" href="#">
+                                            Item
+                                        </a>
+                                    </li> #}
+
+                                    <li><hr class="dropdown-divider"/></li>
+
+                                    <li>
+                                        {# Disable Turbo on this link. We are changing permission contexts #}
+                                        <a class="dropdown-item" href="{{ path('logout') }}" data-turbo="false">
+                                            Sign Out
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            {{ include('partials/_flashes.html.twig') }}
+        </div>
+
+        {% block body %}
+            <div id="app"></div>
+        {% endblock %}
+
+        <div id="footer" class="navbar navbar-light bg-light">
+            <div class="container-fluid">
+                <div class="navbar-nav"></div>
+            </div>
+        </div>
+    </body>
+</html>

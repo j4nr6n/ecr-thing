@@ -1,0 +1,60 @@
+@charset "UTF-8";
+
+@import '~bootstrap/scss/bootstrap';
+@import '~@fonts/titillium-web';
+@import '~@fonts/open-sans';
+@import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@import '~@fortawesome/fontawesome-free/scss/solid.scss';
+@import '~@fortawesome/fontawesome-free/scss/brands.scss';
+
+html {
+    position: relative;
+    min-height: 100%;
+
+    body {
+        font-family: 'Open Sans', 'sans-serif';
+
+        h1,h2,h3,h4,h5,h6 {
+            font-family: 'Titillium Web', 'sans-serif';
+        }
+
+        /* footer height + desired space */
+        margin-bottom: 4rem;
+
+        #footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+
+            /* fixed height of the footer */
+            height: 3rem;
+        }
+
+        overflow-x: hidden;
+    }
+
+    &[data-turbo-preview] body {
+        opacity: .8;
+    }
+
+    > .turbo-progress-bar {
+        background-color: $warning;
+    }
+}
+
+
+/**
+ * experimentation
+ * not in component CSS stylesheet because it's intended to be defined by the implementation
+ */
+.fade-enter-active, .fade-leave-active {
+    transition: opacity 500ms;
+}
+
+.fade-enter-from, .fade-leave-to {
+    opacity: 0;
+}
+
+.fade-enter-to, .fade-leave-from {
+    opacity: 1;
+}
