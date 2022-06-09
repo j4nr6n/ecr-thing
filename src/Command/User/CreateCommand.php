@@ -4,6 +4,7 @@ namespace App\Command\User;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,10 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+#[AsCommand('app:user:create')]
 class CreateCommand extends Command
 {
-    protected static $defaultName = 'app:user:create';
-
     private EntityManagerInterface $entityManager;
     private UserPasswordHasherInterface $passwordHasher;
 
