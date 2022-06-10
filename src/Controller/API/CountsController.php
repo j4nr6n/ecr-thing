@@ -19,7 +19,7 @@ class CountsController extends AbstractController
             'dmr_nodes' => $api->getDMRNodes(),
             'hh_nodes' => $api->getHHNodes(),
             'hoip_nodes' => $api->getHPNodes(),
-            'allstar_users' => $api->getAllstarNodes(),
+            'allstar_nodes' => $api->getAllstarNodes(),
             'irlp_nodes' => $api->getIRLPNodes(),
         ]);
     }
