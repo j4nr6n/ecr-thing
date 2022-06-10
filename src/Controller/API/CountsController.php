@@ -11,8 +11,8 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api', name: 'app_api')]
 class CountsController extends AbstractController
 {
-    #[Route('/counts', name: '_counts')]
-    public function getCounts(CalebApi $api): Response
+    #[Route('/nodes', name: '_nodes')]
+    public function getNodes(CalebApi $api): Response
     {
         return $this->json([
             'p25_nodes' => $api->getP25Nodes(),
