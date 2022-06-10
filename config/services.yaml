@@ -22,3 +22,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    App\CalebApi:
+        arguments:
+            $p25url: '%env(P25_URL)%'
+            $dmrUrl: '%env(DMR_URL)%'
+            $allstarUrl: '%env(ALLSTAR_URL)%'
+            $allstarPort: '%env(ALLSTAR_PORT)%'
+            $irlpUrl: '%env(IRLP_URL)%'
+            $irlpToken: '%env(IRLP_TOKEN)%'
