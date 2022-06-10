@@ -51,9 +51,9 @@ class CalebApi
 
     public function getHHNodes(): array
     {
-        $nodes = $this->getAllstarNodes();
+        $nodes = $this->getVoipNodes();
 
-        $result = array_filter($nodes, static function ($nodeId) {
+        $result = array_filter($nodes, static function (string $nodeId) {
             return str_starts_with($nodeId, 'HH');
         });
 
@@ -62,9 +62,9 @@ class CalebApi
 
     public function getHPNodes(): array
     {
-        $nodes = $this->getAllstarNodes();
+        $nodes = $this->getVoipNodes();
 
-        $result = array_filter($nodes, static function ($nodeId) {
+        $result = array_filter($nodes, static function (string $nodeId) {
             return str_starts_with($nodeId, 'HP');
         });
 
@@ -73,27 +73,13 @@ class CalebApi
 
     public function getAllstarNodes(): array
     {
-        $httpClient = $this->httpClient;
-        $url = $this->allstarUrl;
-        $port = $this->allstarPort;
+        $nodes = $this->getVoipNodes();
 
-        /** @var array $result */
-        $result = $this->cache->get(
-            'ALLSTAR_NODES',
-            static function (ItemInterface $item) use ($httpClient, $url, $port): array {
-                $item->expiresAfter(3600);
+        $result = array_filter($nodes, static function (string $nodeId) {
+            return !in_array(substr($nodeId, 0, 2), ['HH', 'HP']);
+        });
 
-                $result = $httpClient->request('GET', $url, [
-                    'query' => [
-                        'node' => $port,
-                    ],
-                ])->toArray();
-
-                return $result['nodes'] ?? [];
-            }
-        );
-
-        return $result;
+        return array_values($result);
     }
 
     public function getIRLPNodes(): array
@@ -108,6 +94,7 @@ class CalebApi
             static function (ItemInterface $item) use ($httpClient, $url, $token): array {
                 $item->expiresAfter(3600);
 
+                /** @var array[] $result */
                 $result = $httpClient->request('GET', $url, [
                     'headers' => [
                         'authorizationToken' => $token,
@@ -116,8 +103,11 @@ class CalebApi
                     'verify_peer' => false,
                 ])->toArray();
 
-                return array_map(static function ($node) {
-                    return $node['client'];
+                return array_map(static function (array $node) {
+                    /** @var string $clientId */
+                    $clientId = $node['client'];
+
+                    return $clientId;
                 }, $result['IRLP'] ?? []);
             }
         );
@@ -148,6 +138,32 @@ class CalebApi
                 }
 
                 return $callsigns;
+            }
+        );
+
+        return $result;
+    }
+
+    private function getVoipNodes(): array
+    {
+        $httpClient = $this->httpClient;
+        $url = $this->allstarUrl;
+        $port = $this->allstarPort;
+
+        /** @var array $result */
+        $result = $this->cache->get(
+            'ALLSTAR_NODES',
+            static function (ItemInterface $item) use ($httpClient, $url, $port): array {
+                $item->expiresAfter(3600);
+
+                /** @var array[] $result */
+                $result = $httpClient->request('GET', $url, [
+                    'query' => [
+                        'node' => $port,
+                    ],
+                ])->toArray();
+
+                return $result['nodes'] ?? [];
             }
         );
 
