@@ -126,7 +126,10 @@ class CalebApi
 
                 $callsigns = [];
                 foreach ($crawler->filter('b') as $element) {
-                    if (in_array(trim($element->textContent), ['N0CALL', 'MMDVM'])) {
+                    // Strip unicode white space from the callsign
+                    $callsign = preg_replace('/^[\pZ\pC]+|[\pZ\pC]+$/u', '', $element->textContent);
+
+                    if (in_array($callsign, ['N0CALL', 'MMDVM'])) {
                         continue;
                     }
 
