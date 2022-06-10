@@ -27,6 +27,4 @@ services:
             $p25url: '%env(P25_URL)%'
             $dmrUrl: '%env(DMR_URL)%'
             $allstarUrl: '%env(ALLSTAR_URL)%'
-            $allstarPort: '%env(ALLSTAR_PORT)%'
             $irlpUrl: '%env(IRLP_URL)%'
-            $irlpToken: '%env(IRLP_TOKEN)%'

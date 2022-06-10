@@ -13,9 +13,7 @@ class CalebApi
     private string $p25url;
     private string $dmrUrl;
     private string $allstarUrl;
-    private string $allstarPort;
     private string $irlpUrl;
-    private string $irlpToken;
     private CacheInterface $cache;
     private HttpClientInterface $httpClient;
 
@@ -23,18 +21,14 @@ class CalebApi
         string $p25url,
         string $dmrUrl,
         string $allstarUrl,
-        string $allstarPort,
         string $irlpUrl,
-        string $irlpToken,
         CacheInterface $cache,
         HttpClientInterface $httpClient
     ) {
         $this->p25url = $p25url;
         $this->dmrUrl = $dmrUrl;
         $this->allstarUrl = $allstarUrl;
-        $this->allstarPort = $allstarPort;
         $this->irlpUrl = $irlpUrl;
-        $this->irlpToken = $irlpToken;
 
         $this->cache = $cache;
         $this->httpClient = $httpClient;
@@ -87,33 +81,26 @@ class CalebApi
     {
         $httpClient = $this->httpClient;
         $url = $this->irlpUrl;
-        $token = $this->irlpToken;
 
         /** @var array $result */
         $result = $this->cache->get(
             'IRLP_NODES',
-            static function (ItemInterface $item) use ($httpClient, $url, $token): array {
-                $item->expiresAfter(3600);
+            static function (ItemInterface $item) use ($httpClient, $url): array {
+                $item->expiresAfter(60);
 
                 try {
-                    /** @var array[] $result */
-                    $result = $httpClient->request('GET', $url, [
-                        'headers' => [
-                            'authorizationToken' => $token,
-                        ],
-                        'verify_host' => false,
-                        'verify_peer' => false,
-                    ])->toArray();
+                    $response = $httpClient->request('GET', $url);
+                    $crawler = new Crawler($response->getContent());
                 } catch (ExceptionInterface $exception) {
                     return [];
                 }
 
-                return array_map(static function (array $node) {
-                    /** @var string $clientId */
-                    $clientId = $node['client'];
+                $nodes = [];
+                foreach ($crawler->filter('body > center:nth-child(2) > table > tr > td:nth-child(2)') as $td) {
+                    $nodes[] = $td->textContent;
+                }
 
-                    return $clientId;
-                }, $result['IRLP'] ?? []);
+                return $nodes;
             }
         );
 
@@ -128,7 +115,7 @@ class CalebApi
         $result = $this->cache->get(
             'PARSE_CALLSIGNS_' . base64_encode($url),
             static function (ItemInterface $item) use ($httpClient, $url): array {
-                $item->expiresAfter(3600);
+                $item->expiresAfter(60);
 
                 try {
                     $response = $httpClient->request('GET', $url);
@@ -157,21 +144,16 @@ class CalebApi
     {
         $httpClient = $this->httpClient;
         $url = $this->allstarUrl;
-        $port = $this->allstarPort;
 
         /** @var array $result */
         $result = $this->cache->get(
             'ALLSTAR_NODES',
-            static function (ItemInterface $item) use ($httpClient, $url, $port): array {
-                $item->expiresAfter(3600);
+            static function (ItemInterface $item) use ($httpClient, $url): array {
+                $item->expiresAfter(60);
 
                 try {
                     /** @var array[] $result */
-                    $result = $httpClient->request('GET', $url, [
-                        'query' => [
-                            'node' => $port,
-                        ],
-                    ])->toArray();
+                    $result = $httpClient->request('GET', $url)->toArray();
                 } catch (ExceptionInterface $exception) {
                     return [];
                 }
