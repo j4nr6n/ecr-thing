@@ -5,13 +5,14 @@ namespace App\Controller\API;
 use App\CalebApi;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api', name: 'app_api')]
 class CountsController extends AbstractController
 {
-    #[Route('/nodes', name: '_nodes')]
+    #[Route('/nodes', name: '_nodes', methods: [Request::METHOD_GET])]
     public function getNodes(CalebApi $api): Response
     {
         return $this->json([

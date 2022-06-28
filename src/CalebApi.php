@@ -3,6 +3,7 @@
 namespace App;
 
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
@@ -89,7 +90,7 @@ class CalebApi
                 $item->expiresAfter(60);
 
                 try {
-                    $response = $httpClient->request('GET', $url);
+                    $response = $httpClient->request(Request::METHOD_GET, $url);
                     $crawler = new Crawler($response->getContent());
                 } catch (ExceptionInterface $exception) {
                     return [];
@@ -118,7 +119,7 @@ class CalebApi
                 $item->expiresAfter(60);
 
                 try {
-                    $response = $httpClient->request('GET', $url);
+                    $response = $httpClient->request(Request::METHOD_GET, $url);
                     $crawler = new Crawler($response->getContent());
                 } catch (ExceptionInterface $exception) {
                     return [];
@@ -156,12 +157,44 @@ class CalebApi
 
                 try {
                     /** @var array[] $result */
-                    $result = $httpClient->request('GET', $url)->toArray();
+                    $result = $httpClient->request(Request::METHOD_GET, $url)->toArray();
                 } catch (ExceptionInterface $exception) {
                     return [];
                 }
 
                 return $result['nodes'] ?? [];
+            }
+        );
+
+        return $result;
+    }
+
+    public function getAllstarNodesByCallsign(string $callsign): array
+    {
+        $httpClient = $this->httpClient;
+        $url = 'https://stats.allstarlink.org/stats/byCallsign';
+
+        /** @var array $result */
+        $result = $this->cache->get(
+            'ALLSTAR_NODES_BY_CALL_SIGN_' . $callsign,
+            static function (ItemInterface $item) use ($httpClient, $url, $callsign): array {
+                $item->expiresAfter(60);
+
+                try {
+                    $response = $httpClient->request(Request::METHOD_GET, $url, [
+                        'query' => ['callsign' => $callsign]
+                    ]);
+                    $crawler = new Crawler($response->getContent());
+                } catch (ExceptionInterface $exception) {
+                    return [];
+                }
+
+                $nodes = [];
+                foreach ($crawler->filter('body > main > div:nth-child(2) > table > tr > td:nth-child(1)') as $td) {
+                    $nodes[] = $td->textContent;
+                }
+
+                return $nodes;
             }
         );
 
