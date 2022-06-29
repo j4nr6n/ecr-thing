@@ -182,7 +182,7 @@ class CalebApi
 
                 try {
                     $response = $httpClient->request(Request::METHOD_GET, $url, [
-                        'query' => ['callsign' => $callsign]
+                        'query' => ['callsign' => $callsign],
                     ]);
                     $crawler = new Crawler($response->getContent());
                 } catch (ExceptionInterface $exception) {
@@ -191,6 +191,40 @@ class CalebApi
 
                 $nodes = [];
                 foreach ($crawler->filter('body > main > div:nth-child(2) > table > tr > td:nth-child(1)') as $td) {
+                    $nodes[] = $td->textContent;
+                }
+
+                return $nodes;
+            }
+        );
+
+        return $result;
+    }
+
+    public function getEchoLinkNodesByCallsign(string $callsign): array
+    {
+        $httpClient = $this->httpClient;
+        $url = 'https://www.echolink.org/validation/node_lookup.jsp';
+
+        /** @var array $result */
+        $result = $this->cache->get(
+            'ECHOLINK_NODES_BY_CALL_SIGN_' . $callsign,
+            static function (ItemInterface $item) use ($httpClient, $url, $callsign): array {
+                $item->expiresAfter(60);
+
+                try {
+                    $response = $httpClient->request(Request::METHOD_POST, $url, [
+                        'body' => ['call' => $callsign],
+                    ]);
+                    $crawler = new Crawler($response->getContent());
+                } catch (ExceptionInterface $exception) {
+                    return [];
+                }
+
+                $nodes = [];
+                foreach (
+                    $crawler->filter('body > table:nth-child(4) > tr:not(:first-child) > td:nth-child(2)') as $td
+                ) {
                     $nodes[] = $td->textContent;
                 }
 

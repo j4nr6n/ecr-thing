@@ -15,7 +15,8 @@ class LookupController extends AbstractController
     public function byCallsign(string $callsign, CalebApi $api): Response
     {
         return $this->json([
-            'nodes' => $api->getAllstarNodesByCallsign($callsign),
+            'allstar_nodes' => $api->getAllstarNodesByCallsign($callsign),
+            'echolink_nodes' => $api->getEchoLinkNodesByCallsign($callsign),
         ]);
     }
 }
