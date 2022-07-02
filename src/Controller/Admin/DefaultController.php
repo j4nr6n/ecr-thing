@@ -10,9 +10,8 @@ use Symfony\Component\Routing\Annotation\Route;
 class DefaultController extends AbstractController
 {
     #[Route(path: '/admin', name: 'admin_index')]
-    public function index(
-        UserRepository $userRepository
-    ): Response {
+    public function index(UserRepository $userRepository): Response
+    {
         return $this->render('admin/index.html.twig', [
             'user_count' => $userRepository->count([]),
         ]);
